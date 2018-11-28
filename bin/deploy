@@ -1,0 +1,50 @@
+#!/bin/bash
+
+echo "Starting deploy check ..."
+echo
+
+echo "Building gem locally ..."
+echo
+
+make build
+rc=$?
+if [ $rc != 0 ]; then
+  echo "Build failed! Exiting ..."
+  exit $rc
+fi
+
+echo
+echo "Comparing local version to latest remote version ..."
+echo
+
+localVersion=$(ls | grep *.gem | gem specification holidays-*.gem | ruby -e 'require "yaml"; puts YAML.load(STDIN.read).version')
+rc=$?
+if [ $rc != 0 ]; then
+  echo "Unable to obtain local version! Exiting ..."
+  exit $rc
+fi
+
+remoteVersion=$(curl -s https://rubygems.org/api/v1/versions/holidays/latest.json | jq -r '.version')
+rc=$?
+if [ $rc != 0 ]; then
+  echo "Unable to obtain current version from rubygems! Exiting ..."
+  exit $rc
+fi
+
+echo "Local version:  $localVersion"
+echo "Remote version: $remoteVersion"
+echo
+
+if [ "$localVersion" != "$remoteVersion" ]; then
+  echo "Versions do not match! Pushing new version to rubygems.org ..."
+  echo
+  GEM="holidays-$localVersion.gem" make push
+  rc=$?
+  if [ $rc != 0 ]; then
+    echo "Error while pushing to rubygems.org, exiting ..."
+    exit $rc
+  fi
+else
+  echo "The version has not been updated, exiting without pushing to rubygems.org"
+  exit 0
+fi

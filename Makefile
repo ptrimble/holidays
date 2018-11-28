@@ -10,7 +10,7 @@ test:
 	bundle exec rake test
 
 console:
-	bundle exec rake console
+	./bin/console
 
 test-region:
 	bundle exec rake test_region $(REGION)

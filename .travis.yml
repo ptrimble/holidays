@@ -1,32 +1,37 @@
 env: JRUBY_OPTS=--debug
 language: ruby
-
 cache:
   bundler: true
-
-sudo: false
-
 before_install:
-  - gem update --system
-  - gem update bundler
-  - bundle --version
-  - gem --version
-
-script:
-  - make test
-
+- gem update --system
+- gem update bundler
+- bundle --version
+- gem --version
+jobs:
+  include:
+  - stage: test
+    script: make test
+  - stage: deploy
+    script: make deploy
+    if: type != pull_request AND branch = master
 notifications:
-  email:
-    holidaysgem@gmail.com
-
+  email: holidaysgem@gmail.com
 rvm:
-  - 2.2.0
-  - 2.3.0
-  - 2.4.0
-  - jruby-9.0.5.0
-  - 2.5.0
-  - ruby-head
-
+- 2.2.0
+- 2.3.0
+- 2.4.0
+- jruby-9.0.5.0
+- 2.5.0
+- ruby-head
 matrix:
   allow_failures:
-    - rvm: ruby-head
+  - rvm: ruby-head
+deploy:
+  provider: rubygems
+  api_key:
+    secure: PLRCdfm7D3v01rmUbp8+wkKWS1anKdJMktk2P0YrzgPnLUNFbrHzYDXCqFiOg4hAFazjv6ciRzWJdrdTrcc9Zbpk8nrhUoGfncm/7Ij1bePRx56whPuqfxkJeCw9hqhKyDBwv/ULCV7PvAY6CwzVwctqtCBCqAEeT0B8BIOvCLE=
+  gem: holidays
+  on:
+    tags: true
+    repo: holidays/holidays
+    branch: master
