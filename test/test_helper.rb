@@ -2,6 +2,7 @@ require File.dirname(__FILE__) + '/coverage_report'
 
 $:.unshift(File.expand_path(File.dirname(__FILE__) + '../../lib/'))
 
+#FIXME This should be removed since we don't support ruby 1.8 anymore.
 $KCODE = 'u' if RUBY_VERSION =~ /^1\.8/
 
 require 'rubygems'

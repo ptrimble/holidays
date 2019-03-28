@@ -11,6 +11,7 @@ module Holidays
   module Factory
     module Finder
       class << self
+        #TODO Should this be public? Is it ever called outside of this factory?
         def search
           Holidays::Finder::Context::Search.new(
             Factory::Definition.holidays_by_month_repository,
@@ -44,6 +45,7 @@ module Holidays
           )
         end
 
+        #TODO Should this be public? Is it ever called outside of this factory?
         def parse_options
           Holidays::Finder::Context::ParseOptions.new(
             Factory::Definition.regions_repository,

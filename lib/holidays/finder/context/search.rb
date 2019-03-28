@@ -84,7 +84,9 @@ module Holidays
         def custom_holiday(year, month, h)
           @custom_method_processor.call(
             build_custom_method_input(year, month, h[:mday], h[:regions]),
-            h[:function], h[:function_arguments], h[:function_modifier],
+            h[:function],
+            h[:function_arguments],
+            h[:function_modifier],
           )
         end
 
@@ -93,7 +95,24 @@ module Holidays
             year: year,
             month: month,
             day: day,
-            region: regions.first, #FIXME This isn't ideal but will work for our current use case...
+
+            #FIXME This isn't ideal and could lead to confusion in the future. While
+            #      there are no known issues with the current implementation it feels
+            #      very likely that there could be input edge cases that could result in
+            #      undefined/incorrect behavior.
+            #
+            #      Potential example with an issue:
+            #        Holidays.between(Date.civil(2019, 10, 1), Date.civil(2019, 10, 31), :cl, :co)
+            #
+            #      In this case we do not currently have a problem because the two functions that represent
+            #      the same holiday (columbus_day for :co and columbus_day_cl for :cl) have different names.
+            #      This is either a happy accident OR the original submmitter noticed weird behavior
+            #      when adding for `:cl`, which came second, and figured out that giving the function
+            #      a specific name 'fixed' the problem.
+            #
+            #      We should attempt changing `cl` to not use a special function name and use it as an
+            #      integration test.
+            region: regions.first,
           }
         end
 
